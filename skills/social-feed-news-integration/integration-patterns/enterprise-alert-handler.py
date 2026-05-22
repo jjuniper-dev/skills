@@ -57,7 +57,7 @@ class TeamsAlertHandler:
 
     def send_alert(self, alert: AlertMessage) -> bool:
         """
-        Send sentiment alert to Teams
+        Send alert to Teams
 
         Args:
             alert: Alert message to send
