@@ -84,6 +84,17 @@ class Presentation:
 class SlideGenerator:
     """Generate standardized slide structures"""
 
+    # HC/PHAC Brand Colors
+    HC_COLORS = {
+        "primary": (0, 61, 104),        # Dark Blue
+        "secondary": (237, 246, 255),  # Light Blue
+        "tertiary": (229, 255, 239),   # Light Green
+        "neutral": (247, 249, 251),    # Light Gray
+        "border": (148, 163, 184),     # Slate
+        "text_dark": (17, 24, 39),     # Dark Gray
+        "text_white": (255, 255, 255), # White
+    }
+
     @staticmethod
     def create_cover_slide(
         title: str,
@@ -332,6 +343,68 @@ class SlideGenerator:
             content=content,
             speaker_notes=speaker_notes,
             timing_seconds=120
+        )
+
+
+    @staticmethod
+    def create_opportunity_canvas(
+        title: str,
+        canvas_data: Dict[str, List[str]]
+    ) -> Slide:
+        """
+        Create Opportunity Canvas slide (Lean Canvas variant)
+
+        Args:
+            title: Slide title
+            canvas_data: Dict with keys like target_users, problems, solution, etc.
+
+        Returns:
+            Slide with canvas layout
+        """
+        content = [
+            f"**Target Users**: {', '.join(canvas_data.get('target_users', ['TBD'])[:1])}",
+            f"**Problems**: {', '.join(canvas_data.get('problems', ['TBD'])[:1])}",
+            f"**Solution**: {', '.join(canvas_data.get('solution', ['TBD'])[:1])}",
+            f"**Value Prop**: {', '.join(canvas_data.get('value_prop', ['TBD'])[:1])}",
+            f"**Success Metrics**: {', '.join(canvas_data.get('metrics', ['TBD'])[:1])}"
+        ]
+
+        speaker_notes = "Opportunity Canvas:\n\n"
+        for key, values in canvas_data.items():
+            speaker_notes += f"{key.replace('_', ' ').title()}:\n"
+            speaker_notes += "\n".join([f"- {v}" for v in values[:3]]) + "\n\n"
+
+        return Slide(
+            id="slide-canvas",
+            type=SlideType.CONTENT,
+            title=title,
+            subtitle="Canvas Framework",
+            content=content,
+            speaker_notes=speaker_notes,
+            timing_seconds=120,
+            layout="canvas"
+        )
+
+    @staticmethod
+    def create_business_model_canvas(
+        canvas_data: Dict[str, List[str]]
+    ) -> Slide:
+        """Create Business Model Canvas slide"""
+        content = [
+            f"**Partners**: {', '.join(canvas_data.get('key_partners', ['TBD'])[:1])}",
+            f"**Activities**: {', '.join(canvas_data.get('key_activities', ['TBD'])[:1])}",
+            f"**Value**: {', '.join(canvas_data.get('value_propositions', ['TBD'])[:1])}",
+            f"**Customers**: {', '.join(canvas_data.get('customer_segments', ['TBD'])[:1])}",
+            f"**Revenue**: {', '.join(canvas_data.get('revenue_streams', ['TBD'])[:1])}"
+        ]
+
+        return Slide(
+            id="slide-bm-canvas",
+            type=SlideType.CHART,
+            title="Business Model Canvas",
+            content=content,
+            timing_seconds=120,
+            layout="canvas"
         )
 
 
