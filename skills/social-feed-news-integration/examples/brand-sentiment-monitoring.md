@@ -131,13 +131,17 @@ alerts:
       threshold: 10
       operator: gte
     actions:
-      - slack_channel: "#crisis-response"
-        message: "🚨 Negative sentiment spike detected"
-      - pagerduty_severity: warning
-      - create_ticket:
-          system: jira
-          project: CX
-          issue_type: Incident
+      - teams_alert:
+          channel: "Crisis Response"
+          message: "🚨 Negative sentiment spike detected"
+          severity: high
+      - servicenow_incident:
+          category: "Social Media"
+          urgency: 2
+          assignment_group: "Communications & Intelligence"
+      - sharepoint_log:
+          list: "Social Media Alerts"
+          tags: ["crisis", "sentiment"]
     
   - id: alert-002
     name: "High-influence negative post"
@@ -149,9 +153,14 @@ alerts:
         - influence_score: gte 0.8
       threshold: 1
     actions:
-      - slack_channel: "#comms-team"
-        message: "⚠️ High-influence account posted negative mention"
-      - pagerduty_severity: critical
+      - teams_alert:
+          channel: "Communications Team"
+          message: "⚠️ High-influence account posted negative mention"
+          severity: critical
+      - servicenow_incident:
+          category: "Social Media"
+          urgency: 1
+          assignment_group: "Communications & Intelligence"
     
   - id: alert-003
     name: "Trending topic"
@@ -161,8 +170,13 @@ alerts:
       window: 1800  # 30 min
       trend_change: 300  # % increase
     actions:
-      - slack_channel: "#marketing"
-        message: "📈 Trending topic detected"
+      - teams_alert:
+          channel: "Marketing"
+          message: "📈 Trending topic detected"
+          severity: medium
+      - sharepoint_log:
+          list: "Trending Topics"
+          tags: ["trend", "marketing"]
       - dashboard_pin: true
 
   - id: alert-004
@@ -175,8 +189,13 @@ alerts:
       operator: lt
       window: 1800
     actions:
-      - slack_channel: "#product"
-        message: "⚠️ Low sentiment mention of AI Platform"
+      - teams_alert:
+          channel: "Product Team"
+          message: "⚠️ Low sentiment mention of AI Platform"
+          severity: medium
+      - sharepoint_log:
+          list: "Product Mentions"
+          tags: ["product", "sentiment"]
 ```
 
 ## Dashboard Metrics (Real-time)
@@ -236,37 +255,71 @@ alerts:
 
 ## Integration Points
 
-### Slack Integration
+### Teams Alert
 ```json
 {
-  "type": "slack_alert",
-  "channel": "#comms-team",
-  "message": {
-    "blocks": [
+  "type": "teams_alert",
+  "webhook_url": "https://outlook.webhook.office.com/webhookb2/...",
+  "payload": {
+    "@type": "MessageCard",
+    "@context": "https://schema.org/extensions",
+    "summary": "Negative sentiment spike detected",
+    "themeColor": "ff0000",
+    "sections": [
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "🚨 *Negative sentiment spike detected*\n10+ negative mentions in the last hour"
-        }
-      },
-      {
-        "type": "section",
-        "fields": [
-          {"type": "mrkdwn", "text": "*Volume*\n10 mentions"},
-          {"type": "mrkdwn", "text": "*Avg Sentiment*\n-0.72"},
-          {"type": "mrkdwn", "text": "*Reach*\n125K"},
-          {"type": "mrkdwn", "text": "*Status*\n⚠️ Active"}
-        ]
-      },
-      {
-        "type": "actions",
-        "elements": [
-          {"type": "button", "text": "View Dashboard", "url": "https://dashboard.example.com"},
-          {"type": "button", "text": "Create Ticket", "action_id": "create_ticket"}
+        "activityTitle": "🚨 Negative Sentiment Spike",
+        "activitySubtitle": "[HIGH] Social Media Monitoring",
+        "text": "10+ negative mentions detected in the last hour",
+        "facts": [
+          {"name": "Volume", "value": "10 mentions"},
+          {"name": "Avg Sentiment", "value": "-0.72"},
+          {"name": "Reach", "value": "125K"},
+          {"name": "Status", "value": "⚠️ Active"}
         ]
       }
+    ],
+    "potentialAction": [
+      {
+        "@type": "ViewAction",
+        "name": "View Dashboard",
+        "target": ["https://dashboard.example.com"]
+      }
     ]
+  }
+}
+```
+
+### SharePoint List Storage
+```json
+{
+  "type": "sharepoint_alert",
+  "site_url": "https://org.sharepoint.com/sites/analytics",
+  "list_name": "Social Media Alerts",
+  "item": {
+    "Title": "Negative sentiment spike detected",
+    "Description": "10+ negative mentions in the last hour",
+    "Severity": "high",
+    "Source": "twitter",
+    "Tags": "crisis;sentiment;escalated",
+    "Timestamp": "2026-05-22T14:30:00Z",
+    "DataJson": "{\"volume\": 10, \"avg_sentiment\": -0.72, \"reach\": 125000}"
+  }
+}
+```
+
+### ServiceNow Incident
+```json
+{
+  "type": "servicenow_incident",
+  "instance_url": "https://org.service-now.com",
+  "payload": {
+    "short_description": "Negative sentiment spike detected",
+    "description": "10+ negative mentions in the last hour. Avg sentiment: -0.72. Reach: 125K",
+    "urgency": "2",
+    "impact": "2",
+    "category": "Social Media",
+    "assignment_group": "Communications & Intelligence",
+    "correlation_id": "twitter:2026-05-22T14:30:00Z"
   }
 }
 ```
