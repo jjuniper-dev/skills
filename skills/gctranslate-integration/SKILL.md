@@ -51,15 +51,16 @@ Integrate Translation Bureau's GCTranslate service — the Government of Canada'
 - Requires GC network access or VPN
 - Department must be onboarded (PSPC manages access)
 
-## Workflow
-1. **Authenticate** - Use GC credentials (GCKey, GCID, certificate)
-2. **Prepare content** - Normalize text, identify language, note context
-3. **Classify sensitivity** - Flag if content is high-risk (requires human review)
-4. **Request translation** - Submit to GCTranslate API or web interface
-5. **Review output** - Check quality, terminology, cultural appropriateness
-6. **Apply human judgment** - Approve, edit, or escalate to Translation Bureau
-7. **Publish/send** - Use in Teams, email, SharePoint, or internal system
-8. **Archive** - Log for audit trail and reuse
+## Workflow (SaaS Platform Usage)
+1. **Authenticate** - Log in to GCTranslate portal using GC credentials (GCKey, GCID)
+2. **Access platform** - Navigate to web interface (GC-hosted)
+3. **Prepare content** - Copy/paste or upload text (EN or FR source)
+4. **Classify sensitivity** - Select document type (email, memo, meeting note, etc.)
+5. **Submit translation** - Click translate button, receive EN↔FR output
+6. **Review output** - Check quality, GC terminology, cultural appropriateness
+7. **Apply human judgment** - Accept, edit, or flag for Translation Bureau escalation
+8. **Copy and use** - Paste into Teams, email, SharePoint, or target system
+9. **Track usage** - Platform logs translations for audit trail and learning
 
 ## Quality checks
 - Translation preserves meaning and tone
@@ -70,35 +71,35 @@ Integrate Translation Bureau's GCTranslate service — the Government of Canada'
 - Human review completed for sensitive content
 - Audit trail recorded (who requested, when, which version approved)
 
-## Integration examples
-- **Teams**: Real-time message translation (EN message → FR thread, or vice versa)
-- **Email drafting**: Write in one language, translate draft to the other before sending
-- **Meeting notes**: Capture bilingual notes with translations recorded
-- **SharePoint**: Bilingual document storage (EN + FR versions with translation metadata)
-- **News gathering**: Translate international news summaries for bilingual briefing
+## Use Case Examples
+- **Urgent email response**: Public servant receives EN email, uses GCTranslate to draft FR response quickly
+- **Team alignment**: Translate key meeting decisions to FR for minority language team members
+- **Policy memo rollout**: Draft policy in EN, translate via GCTranslate, publish both versions
+- **Bilingual briefing**: Translate news summaries or reports for executive briefing in both languages
+- **Cross-departmental communication**: PSPC guidance translated for other departments using GCTranslate
 
-## Outputs
-- Translated text (plain text or formatted)
-- JSON with metadata (source, target, confidence, timestamp)
-- Audit log (department, user, content category, approval status)
-- Batch export (multiple translations with quality flags)
+## Outputs from SaaS Platform
+- Translated text (EN↔FR, copy-paste ready)
+- Suggested terminology (from GC glossaries)
+- Quality confidence indicator
+- Usage log (department, user, timestamp, content type)
+- Translation history (searchable for reuse)
 
-## Configuration
-- GC credentials (GCKey or certificate)
-- Department/agency identifier
-- Default source/target languages
-- Glossary references (GC terminology database)
-- Sensitivity classification rules
-- Audit logging destination (SharePoint or internal database)
-- Team channels for review workflows
+## Department Onboarding (SaaS Access)
+- **Request access**: Submit department onboarding request to PSPC
+- **User provisioning**: GC credentials (GCKey, GCID) grant platform access
+- **Training**: Translation Bureau provides user guides and best practices
+- **Department glossary**: Optional custom terminology for domain-specific language (finance, health, etc.)
+- **Usage monitoring**: Track translations per department/user for governance
+- **Escalation workflow**: Define process for flagging high-risk content to Translation Bureau
 
-## Integrations
-- Microsoft Teams (message translation plug-in)
-- Outlook/Email (draft translation)
-- SharePoint (bilingual document versioning)
-- ServiceNow (ticket translation for bilingual support)
-- Custom GC systems (via API)
-- Translation Bureau workflow (escalation for professional review)
+## Workflow Integration (Using SaaS Platform)
+- **Teams**: Copy message → GCTranslate → paste translated version in thread or separate message
+- **Email**: Draft in EN → copy to GCTranslate → paste FR version to Outlook reply
+- **SharePoint**: Store original and translated versions side-by-side with metadata
+- **Meeting notes**: Transcribe in one language → translate via GCTranslate → publish bilingual notes
+- **Memo/directive**: Author in EN → translate → distribute both versions
+- **Manual escalation**: Flag high-risk content → send to Translation Bureau for professional review
 
 ## Related Patterns
 This skill demonstrates the **governance-first enterprise AI** pattern used in the HC/PHAC platform strategy:
