@@ -10,7 +10,7 @@ Users log in via our web app or mobile app.
 The system has core services: auth service, data ingestion, analytics engine, and reporting.
 Data comes from customer integrations (Salesforce, HubSpot, custom APIs).
 We store data in a data lake (S3) and use a data warehouse (Snowflake) for analytics.
-Reports are delivered via email, Slack, or embedded dashboards.
+Reports are delivered via email, Microsoft Teams, or embedded dashboards.
 Monitoring and logging go to DataDog.
 ```
 
@@ -43,7 +43,7 @@ graph TB
     
     subgraph Delivery["Delivery Channels"]
         EMAIL["Email"]
-        SLACK["Slack"]
+        TEAMS["Microsoft Teams"]
         DASHBOARD["Dashboards"]
     end
     
@@ -70,7 +70,7 @@ graph TB
     
     REPORTING --> ANALYTICS
     REPORTING --> EMAIL
-    REPORTING --> SLACK
+    REPORTING --> TEAMS
     REPORTING --> DASHBOARD
     
     AUTH -.-> DD

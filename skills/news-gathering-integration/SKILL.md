@@ -65,7 +65,7 @@ Aggregate, normalize, and integrate news from multiple sources (RSS, APIs, web) 
 - RSS (repurposing aggregated feed)
 - Dashboard JSON (summary metrics + top articles)
 - Email digest (markdown or HTML)
-- Alert payloads (webhook, Slack, email)
+- Alert payloads (Teams webhook, SharePoint list, ServiceNow incident, email)
 
 ## Integration examples
 - News APIs: NewsAPI, Guardian, NYTimes, Financial Times

@@ -65,11 +65,13 @@ Aggregate, normalize, and integrate social media feeds and news sources into str
 - Archive query interface
 
 ## Integrations
-- Slack/Teams alerts
+- Microsoft Teams alerts via incoming webhooks
+- SharePoint list storage for alerts and reports
+- ServiceNow incident creation and management
 - Dashboard ingestion (Tableau, Power BI)
 - Analytics platforms (Splunk, DataDog)
 - Threat detection systems
-- Incident management (PagerDuty, Jira)
+- Incident management (ServiceNow, Jira)
 
 ## Examples
 - Brand sentiment tracking dashboard
