@@ -1,0 +1,206 @@
+{
+  "name": "02. Score & Route Intelligence Items",
+  "nodes": [
+    {
+      "parameters": {
+        "waitForWebhook": true
+      },
+      "id": "node-webhook",
+      "name": "Webhook (from Ingest)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate relevance score (0-100)\nconst item = $json;\nconst relevanceBreakdown = {\n  ai_governance: 0,\n  enterprise_strategy: 0,\n  policy_community: 0,\n  pca_impact: 0\n};\n\n// AI Governance keywords\nif (/ai|artificial intelligence|regulation|responsible ai|liability|governance/i.test(item.title + item.summary)) {\n  relevanceBreakdown.ai_governance = 25;\n}\n\n// Enterprise Strategy keywords\nif (/platform|cloud|infrastructure|modernization|digital|roadmap/i.test(item.title + item.summary)) {\n  relevanceBreakdown.enterprise_strategy = 20;\n}\n\n// Policy/Community keywords\nif (/policy|regulation|parliament|senate|health|public|stakeholder/i.test(item.title + item.summary)) {\n  relevanceBreakdown.policy_community = 22;\n}\n\n// PCA Impact keywords\nif (/privacy|data protection|pipeda|gdpr|consent|security|breach/i.test(item.title + item.summary)) {\n  relevanceBreakdown.pca_impact = 20;\n}\n\nconst relevanceScore = Math.min(\n  relevanceBreakdown.ai_governance + \n  relevanceBreakdown.enterprise_strategy + \n  relevanceBreakdown.policy_community + \n  relevanceBreakdown.pca_impact, \n  100\n);\n\nreturn { ...item, relevanceBreakdown, relevanceScore };"
+      },
+      "id": "node-score-relevance",
+      "name": "Score Relevance (AI, Strategy, Policy, PCA)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate novelty score (0-100) based on time since publication\nconst item = $json;\nconst publishedDate = new Date(item.published_date);\nconst now = new Date();\nconst hoursOld = (now - publishedDate) / (1000 * 60 * 60);\n\nlet noveltyScore;\nif (hoursOld < 1) noveltyScore = 100;\nelse if (hoursOld < 6) noveltyScore = 80;\nelse if (hoursOld < 24) noveltyScore = 60;\nelse if (hoursOld < 48) noveltyScore = 30;\nelse noveltyScore = 10;\n\nreturn { ...item, noveltyScore, hoursOld };"
+      },
+      "id": "node-score-novelty",
+      "name": "Score Novelty (Time-Based)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate quality score (0-100) based on source credibility\nconst item = $json;\n\nconst sourceCredibility = {\n  'Reuters': 95,\n  'AP': 95,\n  'BBC': 90,\n  'Guardian': 85,\n  'CNN': 80,\n  'Health Affairs': 90,\n  'JAMA': 95,\n  'NewsAPI': 70,\n  'Twitter': 40,\n  'Reddit': 30\n};\n\nconst credibilityScore = sourceCredibility[item.source] || 60;\nconst editorialScore = item.source.includes('news') ? 80 : 50;\nconst qualityScore = Math.round((credibilityScore + editorialScore) / 2);\n\nreturn { ...item, qualityScore, sourceCredibility: credibilityScore };"
+      },
+      "id": "node-score-quality",
+      "name": "Score Quality (Source Credibility)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine all scores: (0.4 × relevance) + (0.3 × novelty) + (0.3 × quality)\nconst item = $json;\nconst combinedScore = Math.round(\n  (item.relevanceScore * 0.4) +\n  (item.noveltyScore * 0.3) +\n  (item.qualityScore * 0.3)\n);\n\nreturn { ...item, combinedScore };"
+      },
+      "id": "node-combine-scores",
+      "name": "Combine Scores (Weighted)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Route decision based on score\nconst item = $json;\nlet routing = {};\n\nif (item.combinedScore >= 85) {\n  routing = {\n    alert: true,\n    daily_brief: true,\n    obsidian: true,\n    airtable: true,\n    teams: true,\n    email: true,\n    routing_decision: 'ALERT_AND_BRIEF'\n  };\n} else if (item.combinedScore >= 70) {\n  routing = {\n    alert: false,\n    daily_brief: true,\n    obsidian: true,\n    airtable: true,\n    teams: false,\n    email: false,\n    routing_decision: 'DAILY_BRIEF'\n  };\n} else if (item.combinedScore >= 50) {\n  routing = {\n    alert: false,\n    daily_brief: false,\n    obsidian: true,\n    airtable: true,\n    teams: false,\n    email: false,\n    routing_decision: 'ARCHIVE_ONLY'\n  };\n} else {\n  routing = {\n    alert: false,\n    daily_brief: false,\n    obsidian: false,\n    airtable: true,\n    teams: false,\n    email: false,\n    routing_decision: 'DISCARD'\n  };\n}\n\nreturn { ...item, ...routing, scored_at: new Date().toISOString() };"
+      },
+      "id": "node-route-decision",
+      "name": "Route Decision Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Feed%20Items/{{ $json.record_id }}",
+        "body": "{\n  \"fields\": {\n    \"relevance_score\": {{ $json.relevanceScore }},\n    \"novelty_score\": {{ $json.noveltyScore }},\n    \"quality_score\": {{ $json.qualityScore }},\n    \"combined_score\": {{ $json.combinedScore }},\n    \"routing_decision\": \"{{ $json.routing_decision }}\",\n    \"status\": \"SCORED\"\n  }\n}"
+      },
+      "id": "node-update-airtable",
+      "name": "Update Airtable with Scores",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.N8N_WEBHOOK_ALERT }}",
+        "condition": "={{ $json.alert === true }}"
+      },
+      "id": "node-trigger-alert",
+      "name": "Trigger Alert (if score >85)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.N8N_WEBHOOK_OBSIDIAN }}",
+        "condition": "={{ $json.obsidian === true }}"
+      },
+      "id": "node-trigger-obsidian",
+      "name": "Trigger Archive to Obsidian",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1000,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "node-webhook": {
+      "main": [
+        [
+          {
+            "node": "node-score-relevance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-score-relevance": {
+      "main": [
+        [
+          {
+            "node": "node-score-novelty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-score-novelty": {
+      "main": [
+        [
+          {
+            "node": "node-score-quality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-score-quality": {
+      "main": [
+        [
+          {
+            "node": "node-combine-scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-combine-scores": {
+      "main": [
+        [
+          {
+            "node": "node-route-decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-route-decision": {
+      "main": [
+        [
+          {
+            "node": "node-update-airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "node-trigger-alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "node-trigger-obsidian",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

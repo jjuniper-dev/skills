@@ -1,0 +1,74 @@
+{
+  "name": "04. Real-Time Alerts (Teams + Email)",
+  "nodes": [
+    {
+      "parameters": {
+        "waitForWebhook": true
+      },
+      "id": "node-webhook",
+      "name": "Webhook (score >85)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format Teams message with adaptive card\nconst item = $json;\nconst scoreColor = item.combinedScore >= 90 ? '#FF0000' : '#FF6B6B'; // Red for high priority\n\nconst teamsMessage = {\n  \"@type\": \"MessageCard\",\n  \"@context\": \"https://schema.org/extensions\",\n  \"summary\": item.title,\n  \"themeColor\": scoreColor,\n  \"sections\": [\n    {\n      \"activityTitle\": item.title,\n      \"activitySubtitle\": `${item.source} • Score: ${item.combinedScore}/100`,\n      \"text\": item.summary,\n      \"potentialAction\": [\n        {\n          \"@type\": \"OpenUri\",\n          \"name\": \"Read Full Article\",\n          \"targets\": [{\"os\": \"default\", \"uri\": item.link}]\n        }\n      ]\n    },\n    {\n      \"activityTitle\": \"Intelligence Scores\",\n      \"facts\": [\n        {\"name\": \"Relevance\", \"value\": `${item.relevanceScore}/100`},\n        {\"name\": \"Novelty\", \"value\": `${item.noveltyScore}/100`},\n        {\"name\": \"Quality\", \"value\": `${item.qualityScore}/100`},\n        {\"name\": \"Combined\", \"value\": `${item.combinedScore}/100`}\n      ]\n    }\n  ]\n};\n\nreturn { ...item, teamsMessage };"
+      },
+      "id": "node-format-teams",
+      "name": "Format Teams Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format email alert\nconst item = $json;\n\nconst emailBody = `\nHi Leadership,\n\nHigh-priority intelligence alert (Score: ${item.combinedScore}/100)\n\n**${item.title}**\n\n${item.summary}\n\n**Details:**\n- Source: ${item.source}\n- Published: ${new Date(item.published_date).toLocaleString()}\n- Relevance: ${item.relevanceScore}/100 (AI Governance/Enterprise/Policy/PCA impact)\n- Novelty: ${item.noveltyScore}/100\n- Quality: ${item.qualityScore}/100\n\n**Read more:** ${item.link}\n\n---\nThis is an automated alert from the HC/PHAC Intelligence Monitoring Platform.\n`;\n\nreturn { ...item, emailBody };"
+      },
+      "id": "node-format-email",
+      "name": "Format Email Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.TEAMS_WEBHOOK_ALERTS }}",
+        "body": "{{ $json.teamsMessage }}"
+      },
+      "id": "node-send-teams",
+      "name": "Send Teams Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "{{ $env.EMAIL_FROM }}",
+        "toEmail": "{{ $env.EMAIL_ALERTS_LIST }}",
+        "subject": `[INTELLIGENCE ALERT] {{$json.title | truncate(60)}}`,
+        "text": "{{ $json.emailBody }}"
+      },
+      "id": "node-send-email",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.sendGrid",
+      "typeVersion": 1,
+      "position": [600, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Alerts",
+        "body": \"{\n  \\\"records\\\": [{\n    \\\"fields\\\": {\n      \\\"feed_item_id\\\": \\\"{{ $json.id }}\\\",\n      \\\"title\\\": \\\"{{ $json.title }}\\\",\n      \\\"score\\\": {{ $json.combinedScore }},\n      \\\"alert_sent_at\\\": \\\"{{ $json.alert_sent_at }}\\\",\n      \\\"teams_sent\\\": true,\n      \\\"email_sent\\\": true,\n      \\\"status\\\": \\\"DELIVERED\\\"\n    }\n  }]\n}\""
+      },
+      "id": "node-log-alert",
+      "name": "Log Alert Delivery (Airtable)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "node-webhook": {
+      "main": [[{\"node\": \"node-format-teams\", \"type\": \"main\", \"index\": 0}, {\"node\": \"node-format-email\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-format-teams\": {\n      \"main\": [[{\"node\": \"node-send-teams\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-format-email\": {\n      \"main\": [[{\"node\": \"node-send-email\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-send-teams\": {\n      \"main\": [[{\"node\": \"node-log-alert\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-send-email\": {\n      \"main\": [[{\"node\": \"node-log-alert\", \"type\": \"main\", \"index\": 0}]]\n    }\n  }\n}

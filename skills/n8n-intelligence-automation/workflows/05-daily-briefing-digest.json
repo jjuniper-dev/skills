@@ -1,0 +1,47 @@
+{
+  "name": "05. Daily Briefing Digest (6 AM)",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [{"hour": 6, "minute": 0}]
+      },
+      "id": "node-cron",
+      "name": "Cron (Daily 6:00 AM UTC)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Feed%20Items?filterByFormula=AND(combined_score%3E%3D70,combined_score%3C85,IS_AFTER(published_date,NOW()-86400))"
+      },
+      "id": "node-fetch-brief-items",
+      "name": "Fetch Items for Daily Brief (Score 70-84, Last 24h)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Group items by category/tier\nconst items = $json.records.map(r => r.fields);\nconst grouped = {};\n\nitems.forEach(item => {\n  const tier = `Tier ${item.source_tier}`;\n  if (!grouped[tier]) grouped[tier] = [];\n  grouped[tier].push(item);\n});\n\nreturn { grouped, item_count: items.length, items };"
+      },
+      "id": "node-group-items",
+      "name": "Group Items by Tier",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate briefing markdown\nconst data = $json;\nlet markdown = `# Daily Intelligence Briefing\\n\\n**Date**: ${new Date().toLocaleDateString('en-CA')}\\n**Time**: ${new Date().toLocaleTimeString()}\\n\\n`;\n\nmardown += `## Executive Summary\\n`;\nmardown += `Total items reviewed: ${data.item_count}\\n\\n`;\n\nObject.entries(data.grouped).forEach(([tier, items]) => {\n  markdown += `### ${tier}\\n\\n`;\n  items.slice(0, 3).forEach(item => {\n    markdown += `- **${item.title}**\\n  - Source: ${item.source}\\n  - Score: ${item.combined_score}/100\\n  - [Read more](${item.link})\\n\\n`;\n  });\n});\n\nreturn { markdown };"
+      },
+      "id": "node-generate-briefing",
+      "name": "Generate Briefing Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        \"method\": \"POST\",\n        \"url\": \"https://graph.microsoft.com/v1.0/me/sendMail\",\n        \"body\": \"{\\\"message\\\": {\\\"subject\\\": \\\"Daily Intelligence Briefing - {{ $json.briefing_date }}\\\", \\\"body\\\": {\\\"contentType\\\": \\\"HTML\\\", \\\"content\\\": \\\"{{ $json.markdown }}\\\"}, \\\"toRecipients\\\": [{\\\"emailAddress\\\": {\\\"address\\\": \\\"{{ $env.EMAIL_LEADERSHIP_LIST }}\\\"}}]}}\"\n      },\n      \"id\": \"node-send-email-briefing\",\n      \"name\": \"Send Email Briefing to Leadership\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [900, 200]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"{{ $env.TEAMS_WEBHOOK_BRIEFING }}\",\n        \"body\": \"{\\\"text\\\": \\\"📊 Daily Intelligence Briefing ({{ $json.briefing_date }})\\\\n\\\\n{{ $json.markdown }}\\\"}\"\n      },\n      \"id\": \"node-send-teams-briefing\",\n      \"name\": \"Send Teams Briefing\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [900, 400]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Daily%20Briefing\",\n        \"body\": \"{\\\"records\\\": [{\\\"fields\\\": {\\\"date\\\": \\\"{{ $json.briefing_date }}\\\", \\\"item_count\\\": {{ $json.item_count }}, \\\"sent_at\\\": \\\"{{ $json.sent_at }}\\\", \\\"markdown_content\\\": \\\"{{ $json.markdown }}\\\", \\\"status\\\": \\\"SENT\\\"}}]}\"\n      },\n      \"id\": \"node-log-briefing\",\n      \"name\": \"Log Briefing to Airtable\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [1100, 300]\n    }\n  ],\n  \"connections\": {\n    \"node-cron\": {\n      \"main\": [[{\"node\": \"node-fetch-brief-items\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-fetch-brief-items\": {\n      \"main\": [[{\"node\": \"node-group-items\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-group-items\": {\n      \"main\": [[{\"node\": \"node-generate-briefing\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-generate-briefing\": {\n      \"main\": [[{\"node\": \"node-send-email-briefing\", \"type\": \"main\", \"index\": 0}, {\"node\": \"node-send-teams-briefing\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-send-email-briefing\": {\n      \"main\": [[{\"node\": \"node-log-briefing\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-send-teams-briefing\": {\n      \"main\": [[{\"node\": \"node-log-briefing\", \"type\": \"main\", \"index\": 0}]]\n    }\n  }\n}
