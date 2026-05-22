@@ -1,0 +1,324 @@
+# Template: News Source Configuration
+
+# News source configuration template for aggregating from multiple sources
+# Use this template to define RSS feeds, APIs, web sources, and filtering rules
+
+# Global Settings
+global:
+  # Deduplication window (days)
+  dedup_window_days: 7
+
+  # Minimum relevance score (0-1) to include in output
+  relevance_threshold: 0.5
+
+  # Language filter (ISO 639-1 codes)
+  languages:
+    - en
+    - fr
+
+  # Update frequency (minutes)
+  refresh_interval: 60
+
+  # Archive retention (days)
+  archive_retention_days: 90
+
+# Data Quality Settings
+quality:
+  # Remove duplicates within window
+  deduplication:
+    enabled: true
+    algorithm: "cosine_similarity"  # or "exact_hash"
+    threshold: 0.85
+
+  # Validate source credibility
+  credibility_check:
+    enabled: true
+    trusted_domains:
+      - "reuters.com"
+      - "bbc.com"
+      - "theguardian.com"
+      - "nytimes.com"
+      - "ft.com"
+      - "healthycanadians.gc.ca"
+      - "canada.ca"
+
+    blocked_domains:
+      - "unreliable-source.com"
+      - "misinformation-site.net"
+
+  # Metadata validation
+  required_fields:
+    - title
+    - published_date
+    - source_url
+
+  optional_fields:
+    - author
+    - body
+    - image_url
+
+# RSS Feed Sources
+rss_feeds:
+  - name: "BBC Health News"
+    url: "https://feeds.bbc.co.uk/news/health_and_science/rss.xml"
+    category: "health"
+    language: "en"
+    priority: 1
+    enabled: true
+
+  - name: "Reuters Health"
+    url: "https://feeds.reuters.com/news/health"
+    category: "health"
+    language: "en"
+    priority: 1
+    enabled: true
+
+  - name: "Guardian Science"
+    url: "https://www.theguardian.com/science/rss"
+    category: "science"
+    language: "en"
+    priority: 2
+    enabled: true
+
+  - name: "Health Canada News"
+    url: "https://www.canada.ca/en/health-canada/news.atom"
+    category: "government"
+    language: "en"
+    priority: 1
+    enabled: true
+
+# News API Configuration
+news_api:
+  enabled: true
+  provider: "NewsAPI"  # or "Guardian", "NYTimes", "FinancialTimes"
+  api_key: "${NEWS_API_KEY}"  # Use environment variable
+
+  queries:
+    - keyword: "artificial intelligence"
+      sources: ["techcrunch", "wired", "theverge"]
+      category: "technology"
+      priority: 1
+
+    - keyword: "health canada"
+      sources: ["cbc-news", "globe-and-mail"]
+      category: "government"
+      priority: 1
+
+    - keyword: "pandemic"
+      sources: ["bbc-news", "cnn", "reuters"]
+      category: "health"
+      priority: 1
+
+    - keyword: "climate change"
+      sources: ["bbc-news", "the-guardian"]
+      category: "environment"
+      priority: 2
+
+# Web Scraping Sources (for press releases, notices)
+web_sources:
+  - name: "Health Canada Press Releases"
+    url: "https://www.canada.ca/en/health-canada/news/releases.html"
+    selector: "a.release-link"  # CSS selector for article links
+    category: "government"
+    language: "en"
+    priority: 1
+    enabled: true
+
+  - name: "PHAC Alerts"
+    url: "https://www.canada.ca/en/public-health/services/disease-health-threats.html"
+    selector: "article.alert"
+    category: "health-alert"
+    language: "en"
+    priority: 1
+    enabled: true
+
+# Filtering and Enrichment
+filtering:
+  # Keywords to include (OR logic)
+  include_keywords:
+    - "artificial intelligence"
+    - "machine learning"
+    - "health"
+    - "canada"
+
+  # Keywords to exclude (NOT logic)
+  exclude_keywords:
+    - "cryptocurrency"
+    - "sports"
+    - "celebrity"
+
+  # Geographic filtering
+  regions:
+    - "Canada"
+    - "North America"
+
+  # Date range filter (optional)
+  date_range:
+    enabled: false
+    start_date: "2026-01-01"
+    end_date: "2026-12-31"
+
+# Enrichment
+enrichment:
+  # Add sentiment analysis
+  sentiment:
+    enabled: true
+    model: "distilbert-base-uncased-finetuned-sst-2-english"
+
+  # Extract named entities
+  entity_extraction:
+    enabled: true
+    types:
+      - "PERSON"
+      - "ORG"
+      - "GPE"  # Geopolitical entities
+      - "PRODUCT"
+
+  # Keyword extraction
+  keywords:
+    enabled: true
+    min_frequency: 1
+    max_keywords: 10
+
+  # Add source credibility score
+  credibility_scoring:
+    enabled: true
+    factors:
+      - domain_authority: 0.4
+      - article_age: 0.2
+      - engagement_metrics: 0.2
+      - publication_history: 0.2
+
+# Aggregation and Reporting
+aggregation:
+  # Group articles by
+  group_by: "topic"  # or "source", "date", "category"
+
+  # Sort articles by
+  sort_by: "relevance"  # or "date", "engagement", "sentiment"
+
+  # Summary generation
+  summarization:
+    enabled: true
+    model: "facebook/bart-large-cnn"
+    max_length: 150
+    min_length: 50
+
+# Alert Configuration
+alerts:
+  # Crisis detection (rapid spike in topic mentions)
+  crisis_detection:
+    enabled: true
+    threshold_spike: 5  # 5x normal volume
+    window_minutes: 60
+
+  # High-relevance items
+  high_relevance:
+    enabled: true
+    min_score: 0.9
+    notify_immediately: true
+
+  # Negative sentiment on key topics
+  negative_sentiment:
+    enabled: true
+    min_sentiment_score: -0.7
+    topics:
+      - "health emergency"
+      - "safety"
+
+  # New source detection (unfamiliar but credible source)
+  new_source:
+    enabled: true
+    min_credibility: 0.7
+
+# Output Configuration
+output:
+  # JSON feed format
+  json:
+    enabled: true
+    path: "/outputs/news-feed-latest.json"
+    indent: 2
+
+  # CSV export for analysis
+  csv:
+    enabled: true
+    path: "/outputs/news-feed-latest.csv"
+    fields:
+      - published_date
+      - title
+      - source
+      - category
+      - sentiment
+      - relevance_score
+      - url
+
+  # Dashboard JSON (for web UI)
+  dashboard:
+    enabled: true
+    path: "/outputs/news-dashboard.json"
+    summary_metrics: true
+    top_articles: 10
+    trending_topics: 5
+
+  # Email digest (optional)
+  email_digest:
+    enabled: true
+    recipients:
+      - "analysts@organization.ca"
+    schedule: "daily"  # or "hourly", "weekly"
+    time: "08:00"  # UTC
+    format: "html"
+
+# Database/Storage Configuration
+storage:
+  # SQLite for local development
+  sqlite:
+    enabled: true
+    path: "/data/news.db"
+
+  # PostgreSQL for production
+  postgresql:
+    enabled: false
+    connection: "postgresql://user:pass@localhost/news_db"
+    tables:
+      - name: "articles"
+        retention_days: 90
+      - name: "topics"
+        retention_days: 365
+      - name: "alerts"
+        retention_days: 180
+
+# Logging and Monitoring
+logging:
+  level: "INFO"  # or "DEBUG", "WARNING", "ERROR"
+  format: "json"  # or "text"
+
+  # Track metrics
+  metrics:
+    - articles_fetched
+    - articles_deduplicated
+    - articles_published
+    - api_errors
+    - processing_time_seconds
+
+# Scheduling (cron-style)
+scheduling:
+  # Full feed update
+  full_refresh:
+    enabled: true
+    cron: "0 */6 * * *"  # Every 6 hours
+
+  # Incremental update
+  incremental_refresh:
+    enabled: true
+    cron: "*/15 * * * *"  # Every 15 minutes
+
+  # Nightly digest
+  digest:
+    enabled: true
+    cron: "0 8 * * *"  # 8 AM UTC daily
+
+  # Cleanup old articles
+  archive_cleanup:
+    enabled: true
+    cron: "0 2 * * 0"  # 2 AM UTC every Sunday

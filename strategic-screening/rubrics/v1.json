@@ -1,0 +1,321 @@
+{
+  "name": "Strategic Initiative Screening Rubric",
+  "version": "1.0",
+  "description": "Structured evaluation framework for screening strategic initiatives, investments, and policy proposals",
+  "created_date": "2026-05-22",
+  "last_updated": "2026-05-22",
+  "scoring_scale": {
+    "1": "Minimal/No evidence",
+    "2": "Weak evidence",
+    "3": "Moderate evidence",
+    "4": "Strong evidence",
+    "5": "Exceptional evidence"
+  },
+  "categories": [
+    {
+      "id": "strategic_alignment",
+      "name": "Strategic Alignment",
+      "description": "Does the initiative advance organizational strategy and priorities?",
+      "weight": 0.20,
+      "criteria": [
+        {
+          "id": "mission_fit",
+          "description": "Alignment with organizational mission and mandate",
+          "scoring_guide": {
+            "1": "No connection to mission",
+            "2": "Tangential connection",
+            "3": "Moderate alignment with mission",
+            "4": "Clear alignment with mission",
+            "5": "Directly advances core mission"
+          }
+        },
+        {
+          "id": "strategy_priority",
+          "description": "Priority in current strategic plan",
+          "scoring_guide": {
+            "1": "Not mentioned in strategy",
+            "2": "Mentioned but low priority",
+            "3": "Medium priority",
+            "4": "High priority",
+            "5": "Critical strategic priority"
+          }
+        },
+        {
+          "id": "stakeholder_buy_in",
+          "description": "Leadership and stakeholder buy-in",
+          "scoring_guide": {
+            "1": "No executive support",
+            "2": "Limited support from some leaders",
+            "3": "Moderate support from leadership",
+            "4": "Strong support from most leaders",
+            "5": "Strong support from all key stakeholders"
+          }
+        }
+      ]
+    },
+    {
+      "id": "impact",
+      "name": "Impact Potential",
+      "description": "What is the magnitude and value of expected outcomes?",
+      "weight": 0.25,
+      "criteria": [
+        {
+          "id": "outcome_scale",
+          "description": "Scale of expected outcomes (people served, cost savings, time reduction)",
+          "scoring_guide": {
+            "1": "Negligible impact (<1% of target)",
+            "2": "Small impact (1-5% of target)",
+            "3": "Moderate impact (5-15% of target)",
+            "4": "Significant impact (15-30% of target)",
+            "5": "Transformative impact (>30% of target)"
+          }
+        },
+        {
+          "id": "measurement",
+          "description": "Clarity and ability to measure outcomes",
+          "scoring_guide": {
+            "1": "Outcomes unmeasurable",
+            "2": "Only qualitative outcomes possible",
+            "3": "Some quantitative metrics available",
+            "4": "Clear metrics with baseline",
+            "5": "Specific, measurable, trackable outcomes"
+          }
+        },
+        {
+          "id": "timeline",
+          "description": "Timeline to realize impact",
+          "scoring_guide": {
+            "1": "> 3 years to impact",
+            "2": "2-3 years to impact",
+            "3": "1-2 years to impact",
+            "4": "6-12 months to impact",
+            "5": "< 6 months to impact"
+          }
+        }
+      ]
+    },
+    {
+      "id": "feasibility",
+      "name": "Feasibility",
+      "description": "Can this initiative be realistically implemented?",
+      "weight": 0.20,
+      "criteria": [
+        {
+          "id": "technical_feasibility",
+          "description": "Technical or operational feasibility",
+          "scoring_guide": {
+            "1": "Technology/approach not available",
+            "2": "Requires unproven technology",
+            "3": "Requires some new capability development",
+            "4": "Mostly uses existing capabilities",
+            "5": "Uses proven, available technology"
+          }
+        },
+        {
+          "id": "complexity",
+          "description": "Implementation complexity and interdependencies",
+          "scoring_guide": {
+            "1": "Highly complex, many dependencies",
+            "2": "Complex with significant dependencies",
+            "3": "Moderate complexity, some dependencies",
+            "4": "Relatively straightforward with few dependencies",
+            "5": "Simple, self-contained initiative"
+          }
+        },
+        {
+          "id": "resource_availability",
+          "description": "Availability of required resources (people, budget, time)",
+          "scoring_guide": {
+            "1": "Critical resources unavailable",
+            "2": "Key resources unavailable",
+            "3": "Some resource gaps",
+            "4": "Most resources available",
+            "5": "All required resources available"
+          }
+        }
+      ]
+    },
+    {
+      "id": "risk",
+      "name": "Risk Management",
+      "description": "What are the risks and how manageable are they?",
+      "weight": 0.15,
+      "criteria": [
+        {
+          "id": "risk_magnitude",
+          "description": "Magnitude of key risks (financial, reputational, operational)",
+          "scoring_guide": {
+            "1": "Critical risks (could cause major harm)",
+            "2": "Major risks (significant negative impact possible)",
+            "3": "Moderate risks (manageable with mitigation)",
+            "4": "Minor risks (low probability or impact)",
+            "5": "Negligible risks"
+          }
+        },
+        {
+          "id": "risk_mitigation",
+          "description": "Quality of risk mitigation strategy",
+          "scoring_guide": {
+            "1": "No mitigation strategy",
+            "2": "Weak mitigation approach",
+            "3": "Adequate mitigation plan",
+            "4": "Strong mitigation strategy",
+            "5": "Comprehensive, tested mitigation approach"
+          }
+        },
+        {
+          "id": "uncertainty",
+          "description": "Degree of uncertainty in assumptions",
+          "scoring_guide": {
+            "1": "High uncertainty (many unproven assumptions)",
+            "2": "Significant uncertainty",
+            "3": "Moderate uncertainty (some validation needed)",
+            "4": "Low uncertainty (well-understood)",
+            "5": "High certainty (extensively tested)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "value",
+      "name": "Financial & Value Return",
+      "description": "What is the return on investment and financial sustainability?",
+      "weight": 0.20,
+      "criteria": [
+        {
+          "id": "cost_estimate",
+          "description": "Cost estimate accuracy and reasonableness",
+          "scoring_guide": {
+            "1": "No cost estimate or highly unreliable",
+            "2": "Rough estimate only",
+            "3": "Preliminary cost estimate",
+            "4": "Detailed cost estimate with contingency",
+            "5": "Well-researched, detailed cost estimate"
+          }
+        },
+        {
+          "id": "roi_payback",
+          "description": "Return on investment and payback period",
+          "scoring_guide": {
+            "1": "ROI unclear or negative",
+            "2": "Positive ROI but > 4 year payback",
+            "3": "Positive ROI, 2-4 year payback",
+            "4": "Strong ROI, 1-2 year payback",
+            "5": "Exceptional ROI, < 1 year payback"
+          }
+        },
+        {
+          "id": "financial_sustainability",
+          "description": "Long-term financial sustainability",
+          "scoring_guide": {
+            "1": "Not sustainable (requires ongoing subsidy)",
+            "2": "Limited sustainability",
+            "3": "Potentially sustainable with cost control",
+            "4": "Likely sustainable",
+            "5": "Highly sustainable (self-funding or revenue-generating)"
+          }
+        }
+      ]
+    }
+  ],
+  "scoring_methodology": {
+    "calculate_weighted_score": "For each category: (sum of criterion scores / number of criteria). Then: (weighted category score × weight) summed across all categories = total score 1-5",
+    "minimum_threshold": 2.5,
+    "strong_initiative": 3.5,
+    "exceptional_initiative": 4.5,
+    "decision_framework": {
+      "4.5-5.0": "Highly recommended - Fast track to approval",
+      "3.5-4.4": "Recommended - Approve with standard governance",
+      "2.5-3.4": "Proceed with caution - Conditional approval / requires refinement",
+      "1.5-2.4": "Not recommended - Significant concerns, require major revision",
+      "1.0-1.4": "Reject - Does not meet minimum standards"
+    }
+  },
+  "assessment_process": [
+    "Step 1: Gather information (business case, technical documents, stakeholder input)",
+    "Step 2: Score each criterion (1-5) with evidence justification",
+    "Step 3: Calculate category scores (average of criteria)",
+    "Step 4: Calculate weighted total (category score × weight)",
+    "Step 5: Determine recommendation based on total score",
+    "Step 6: Document assessment with key findings and risks",
+    "Step 7: Present to decision-makers with score and rationale"
+  ],
+  "documentation_template": {
+    "initiative_name": "[Name of initiative]",
+    "submission_date": "[Date]",
+    "assessed_by": "[Assessor name and role]",
+    "strategic_alignment": {
+      "mission_fit_score": 0,
+      "mission_fit_justification": "[Evidence and reasoning]",
+      "strategy_priority_score": 0,
+      "strategy_priority_justification": "[Evidence and reasoning]",
+      "stakeholder_buyIn_score": 0,
+      "stakeholder_buyIn_justification": "[Evidence and reasoning]",
+      "category_score": 0
+    },
+    "impact": {
+      "outcome_scale_score": 0,
+      "outcome_scale_justification": "[Quantified impact projection]",
+      "measurement_score": 0,
+      "measurement_justification": "[Metrics and KPIs]",
+      "timeline_score": 0,
+      "timeline_justification": "[Implementation schedule]",
+      "category_score": 0
+    },
+    "feasibility": {
+      "technical_feasibility_score": 0,
+      "technical_feasibility_justification": "[Technical assessment]",
+      "complexity_score": 0,
+      "complexity_justification": "[Dependency analysis]",
+      "resource_availability_score": 0,
+      "resource_availability_justification": "[Resource plan]",
+      "category_score": 0
+    },
+    "risk": {
+      "risk_magnitude_score": 0,
+      "risk_magnitude_justification": "[Key risks identified]",
+      "risk_mitigation_score": 0,
+      "risk_mitigation_justification": "[Mitigation strategies]",
+      "uncertainty_score": 0,
+      "uncertainty_justification": "[Assumptions and unknowns]",
+      "category_score": 0
+    },
+    "value": {
+      "cost_estimate_score": 0,
+      "cost_estimate_justification": "[Budget and cost rationale]",
+      "roi_payback_score": 0,
+      "roi_payback_justification": "[Financial projections]",
+      "financial_sustainability_score": 0,
+      "financial_sustainability_justification": "[Long-term funding plan]",
+      "category_score": 0
+    },
+    "total_weighted_score": 0,
+    "recommendation": "[Highly Recommended / Recommended / Proceed with Caution / Not Recommended]",
+    "key_strengths": ["[Strength 1]", "[Strength 2]"],
+    "key_concerns": ["[Concern 1]", "[Concern 2]"],
+    "conditions_for_approval": ["[Condition 1]", "[Condition 2]"],
+    "next_steps": "[Detailed next steps based on decision]"
+  },
+  "examples": [
+    {
+      "initiative": "AI Governance Framework",
+      "strategic_alignment_score": 4.3,
+      "impact_score": 4.1,
+      "feasibility_score": 3.2,
+      "risk_score": 3.5,
+      "value_score": 3.7,
+      "weighted_total": 3.76,
+      "recommendation": "Recommended"
+    },
+    {
+      "initiative": "Legacy System Replacement",
+      "strategic_alignment_score": 3.5,
+      "impact_score": 4.2,
+      "feasibility_score": 2.8,
+      "risk_score": 2.5,
+      "value_score": 3.0,
+      "weighted_total": 3.26,
+      "recommendation": "Proceed with Caution"
+    }
+  ]
+}
