@@ -1,0 +1,36 @@
+{
+  "name": "03. Archive to Obsidian Vault",
+  "nodes": [
+    {
+      "parameters": {
+        "waitForWebhook": true
+      },
+      "id": "node-webhook",
+      "name": "Webhook (from Score & Route)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate markdown filename and path\nconst item = $json;\nconst dateTime = new Date(item.published_date);\nconst dateStr = dateTime.toISOString().split('T')[0];\nconst timeStr = dateTime.toISOString().split('T')[1].substring(0, 5).replace(':', '-');\nconst slug = item.title\n  .toLowerCase()\n  .replace(/[^a-z0-9]+/g, '-')\n  .substring(0, 40);\n\nconst filename = `${dateStr}-${timeStr}-${slug}.md`;\nconst filepath = `/Intelligence/Sources/${item.source_tier}/${filename}`;\n\nreturn { ...item, filename, filepath };"
+      },
+      "id": "node-generate-path",
+      "name": "Generate Obsidian Path & Filename",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate markdown frontmatter and content\nconst item = $json;\n\nconst frontmatter = `---\ntitle: \"${item.title.replace(/\"/g, '\\\\\"')}\"\nsource: \"${item.source}\"\nsource_tier: ${item.source_tier}\ndate: ${item.published_date}\nurl: \"${item.link}\"\ntags:\n  - intelligence\n  - tier-${item.source_tier}\nscore: ${item.combinedScore}\nrelevance: ${item.relevanceScore}\nrouting: ${item.routing_decision}\n---\n`;\n\nconst body = `## Summary\n${item.summary}\n\n## Key Details\n- **Source**: [${item.source}](${item.link})\n- **Published**: ${new Date(item.published_date).toLocaleString()}\n- **Relevance Score**: ${item.relevanceScore}/100\n- **Novelty Score**: ${item.noveltyScore}/100  \n- **Quality Score**: ${item.qualityScore}/100\n- **Combined Score**: ${item.combinedScore}/100\n- **Routing Decision**: ${item.routing_decision}\n\n## Full Content\n${item.body || item.summary}\n\n## Related\n- #intelligence-briefing\n- #tier-${item.source_tier}\n`;\n\nconst markdown = frontmatter + body;\n\nreturn { ...item, markdown, frontmatter };"
+      },
+      "id": "node-generate-markdown",
+      "name": "Generate Markdown Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",\n        \"url\": \"https://{{ $env.OBSIDIAN_VAULT_HOST }}/api/write\",\n        \"headers\": {\n          \"Authorization\": \"Bearer {{ $env.OBSIDIAN_API_KEY }}\"\n        },\n        \"body\": \"{\\\"path\\\": \\\"{{ $json.filepath }}\\\", \\\"content\\\": \\\"{{ $json.markdown }}\\\"}\"\n      },\n      \"id\": \"node-write-obsidian\",\n      \"name\": \"Write to Obsidian Vault (via HTTP)\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [700, 300]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Feed%20Items\",\n        \"body\": \"{\\\"records\\\": [{\\\"fields\\\": {\\\"obsidian_path\\\": \\\"{{ $json.filepath }}\\\", \\\"archived_at\\\": \\\"{{ $json.archived_at }}\\\"}}]}\"\n      },\n      \"id\": \"node-log-archive\",\n      \"name\": \"Log Archive Metadata to Airtable\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [900, 300]\n    }\n  ],\n  \"connections\": {\n    \"node-webhook\": {\n      \"main\": [[{\"node\": \"node-generate-path\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-generate-path\": {\n      \"main\": [[{\"node\": \"node-generate-markdown\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-generate-markdown\": {\n      \"main\": [[{\"node\": \"node-write-obsidian\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-write-obsidian\": {\n      \"main\": [[{\"node\": \"node-log-archive\", \"type\": \"main\", \"index\": 0}]]\n    }\n  }\n}

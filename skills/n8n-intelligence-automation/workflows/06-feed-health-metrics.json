@@ -1,0 +1,49 @@
+{
+  "name": "06. Feed Health & Metrics Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [{"hour": 7, "minute": 0}]
+      },
+      "id": "node-cron",
+      "name": "Cron (Daily 7:00 AM UTC)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Feed%20Items?maxRecords=1000"
+      },
+      "id": "node-fetch-all-items",
+      "name": "Fetch All Feed Items (Last 7 days)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze feed health metrics\nconst items = $json.records.map(r => r.fields);\nconst now = new Date();\nconst sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);\n\nconst feedMetrics = {};\nconst sources = new Set();\n\nitems.forEach(item => {\n  const source = item.source || 'Unknown';\n  sources.add(source);\n  \n  if (!feedMetrics[source]) {\n    feedMetrics[source] = {\n      source,\n      tier: item.source_tier || 'Unknown',\n      item_count: 0,\n      avg_score: 0,\n      last_updated: null,\n      status: 'OK'\n    };\n  }\n  \n  feedMetrics[source].item_count += 1;\n  feedMetrics[source].avg_score += (item.combined_score || 0);\n  \n  const itemDate = new Date(item.published_date);\n  if (!feedMetrics[source].last_updated || itemDate > new Date(feedMetrics[source].last_updated)) {\n    feedMetrics[source].last_updated = item.published_date;\n  }\n});\n\n// Calculate averages and health status\nObject.values(feedMetrics).forEach(feed => {\n  feed.avg_score = Math.round(feed.avg_score / (feed.item_count || 1));\n  \n  const lastUpdate = new Date(feed.last_updated);\n  const hoursSinceUpdate = (now - lastUpdate) / (1000 * 60 * 60);\n  \n  if (hoursSinceUpdate > 48) {\n    feed.status = 'STALE';\n  } else if (hoursSinceUpdate > 24) {\n    feed.status = 'SLOW';\n  } else {\n    feed.status = 'OK';\n  }\n});\n\nreturn {\n  total_sources: sources.size,\n  total_items_7d: items.length,\n  feed_metrics: Object.values(feedMetrics)\n};"
+      },
+      "id": "node-analyze-health",
+      "name": "Analyze Feed Health Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate health report markdown\nconst data = $json;\nlet report = `# Feed Health Report\\n\\n**Generated**: ${new Date().toLocaleString()}\\n\\n`;\nreport += `## Summary\\n`;\nreport += `- Total Sources: ${data.total_sources}\\n`;\nreport += `- Items (7 days): ${data.total_items_7d}\\n`;\nreport += `- Avg Score: ${Math.round(data.feed_metrics.reduce((a,b) => a + b.avg_score, 0) / data.feed_metrics.length)}\\n\\n`;\n\nreport += `## Source Status\\n\\n`;\ndata.feed_metrics.forEach(feed => {\n  const statusIcon = feed.status === 'OK' ? '✅' : feed.status === 'SLOW' ? '⚠️' : '🔴';\n  report += `${statusIcon} **${feed.source}** (Tier ${feed.tier})\\n`;\n  report += `  - Items (7d): ${feed.item_count}\\n`;\n  report += `  - Avg Score: ${feed.avg_score}/100\\n`;\n  report += `  - Last Update: ${new Date(feed.last_updated).toLocaleString()}\\n`;\n  report += `  - Status: ${feed.status}\\n\\n`;\n});\n\nreturn { report };"
+      },
+      "id": "node-generate-report",
+      "name": "Generate Health Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Feed%20Health",
+        "body": \"{\n  \\\"records\\\": [{\n    \\\"fields\\\": {\n      \\\"date\\\": \\\"{{ $json.report_date }}\\\",\n      \\\"total_sources\\\": {{ $json.total_sources }},\n      \\\"total_items_7d\\\": {{ $json.total_items_7d }},\n      \\\"avg_score\\\": {{ $json.feed_metrics | average: 'avg_score' }},\n      \\\"stale_feeds\\\": {{ $json.feed_metrics | filter: 'status' === 'STALE' | length }},\n      \\\"report\\\": \\\"{{ $json.report }}\\\",\n      \\\"status\\\": \\\"MONITORED\\\"\n    }\n  }]\n}\"\n      },\n      \"id\": \"node-log-health\",\n      \"name\": \"Log Health Metrics to Airtable\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [900, 300]\n    },\n    {\n      \"parameters\": {\n        \"method\": \"POST\",\n        \"url\": \"{{ $env.TEAMS_WEBHOOK_ADMIN }}\",\n        \"body\": \"{\\\"text\\\": \\\"📊 Daily Feed Health Report\\\\n\\\\n{{ $json.report }}\\\"}\",\n        \"condition\": \"={{ $json.feed_metrics.filter(f => f.status !== 'OK').length > 0 }}\"\n      },\n      \"id\": \"node-alert-stale\",\n      \"name\": \"Alert if Feed Stale (Teams Admin Channel)\",\n      \"type\": \"n8n-nodes-base.httpRequest\",\n      \"typeVersion\": 4.1,\n      \"position\": [900, 400]\n    }\n  ],\n  \"connections\": {\n    \"node-cron\": {\n      \"main\": [[{\"node\": \"node-fetch-all-items\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-fetch-all-items\": {\n      \"main\": [[{\"node\": \"node-analyze-health\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-analyze-health\": {\n      \"main\": [[{\"node\": \"node-generate-report\", \"type\": \"main\", \"index\": 0}]]\n    },\n    \"node-generate-report\": {\n      \"main\": [[{\"node\": \"node-log-health\", \"type\": \"main\", \"index\": 0}, {\"node\": \"node-alert-stale\", \"type\": \"main\", \"index\": 0}]]\n    }\n  }\n}

@@ -1,0 +1,252 @@
+{
+  "name": "01. Ingest & Dedupe Intelligence Feeds",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": [
+          {
+            "hour": 0,
+            "minute": 0
+          },
+          {
+            "hour": 4,
+            "minute": 0
+          },
+          {
+            "hour": 8,
+            "minute": 0
+          },
+          {
+            "hour": 12,
+            "minute": 0
+          },
+          {
+            "hour": 16,
+            "minute": 0
+          },
+          {
+            "hour": 20,
+            "minute": 0
+          }
+        ]
+      },
+      "id": "node-cron",
+      "name": "Cron (Every 4 hours)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "{{ $env.NEWSAPI_URL }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "={{ $env.NEWSAPI_KEY }}"
+            }
+          ]
+        }
+      },
+      "id": "node-newsapi",
+      "name": "Fetch NewsAPI (Tier 1-2)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        300,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.RSS_FEED_TIER1 }}"
+      },
+      "id": "node-rss-tier1",
+      "name": "Fetch RSS Tier 1 (AI & Governance)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse NewsAPI JSON response\nconst items = data.map(item => ({\n  id: `newsapi-${Buffer.from(item.title + item.url).toString('base64')}`,\n  title: item.title,\n  summary: item.description,\n  body: item.content,\n  link: item.url,\n  source: item.source.name,\n  source_tier: 1,\n  published_date: item.publishedAt,\n  language: 'en',\n  ingested_at: new Date().toISOString()\n}));\nreturn items;"
+      },
+      "id": "node-parse-newsapi",
+      "name": "Parse NewsAPI JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse RSS feed XML to JSON\nconst parseRss = (xmlText) => {\n  const rssItems = xmlText.match(/<item>.*?<\\/item>/gs) || [];\n  return rssItems.map(item => {\n    const title = item.match(/<title>(.*?)<\\/title>/)?.[1] || '';\n    const link = item.match(/<link>(.*?)<\\/link>/)?.[1] || '';\n    const description = item.match(/<description>(.*?)<\\/description>/)?.[1] || '';\n    const pubDate = item.match(/<pubDate>(.*?)<\\/pubDate>/)?.[1] || new Date().toISOString();\n    return {\n      id: `rss-${Buffer.from(title + link).toString('base64')}`,\n      title,\n      summary: description.substring(0, 200),\n      body: description,\n      link,\n      source: 'RSS Tier 1',\n      source_tier: 1,\n      published_date: pubDate,\n      language: 'en',\n      ingested_at: new Date().toISOString()\n    };\n  });\n};\nreturn parseRss(data);"
+      },
+      "id": "node-parse-rss",
+      "name": "Parse RSS Feed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Dedup%20Ledger",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {
+          "headers": {
+            "Authorization": "Bearer {{ $env.AIRTABLE_API_KEY }}"
+          }
+        }
+      },
+      "id": "node-airtable-dedup-lookup",
+      "name": "Lookup Dedup Table (Airtable)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine all feed items and deduplicate\nconst allItems = input.all();\nconst combinedItems = [];\n\n// Flatten from multiple sources\nallItems.forEach(node => {\n  if (Array.isArray(node)) combinedItems.push(...node);\n  else combinedItems.push(node);\n});\n\n// Deduplicate by hash\nconst seen = new Set();\nconst deduped = [];\nconst duplicates = [];\n\ncombinedItems.forEach(item => {\n  const hash = require('crypto')\n    .createHash('sha256')\n    .update(item.title + item.link)\n    .digest('hex');\n  \n  if (seen.has(hash)) {\n    duplicates.push({...item, hash, duplicate_of: hash});\n  } else {\n    deduped.push({...item, hash, duplicate_of: null});\n    seen.add(hash);\n  }\n});\n\nreturn {\n  novel_items: deduped,\n  duplicate_items: duplicates,\n  total_ingested: combinedItems.length,\n  novel_count: deduped.length,\n  duplicate_count: duplicates.length\n};"
+      },
+      "id": "node-dedupe",
+      "name": "Deduplicate (In-Memory)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/{{ $env.AIRTABLE_BASE_ID }}/Feed%20Items",
+        "authentication": "genericCredentialType",
+        "bodyParametersUi": "json",
+        "body": "{\n  \"records\": [\n    {% for item of $json.novel_items %}\n    {\n      \"fields\": {\n        \"title\": \"{{ item.title }}\",\n        \"summary\": \"{{ item.summary }}\",\n        \"link\": \"{{ item.link }}\",\n        \"source\": \"{{ item.source }}\",\n        \"source_tier\": {{ item.source_tier }},\n        \"published_date\": \"{{ item.published_date }}\",\n        \"ingested_at\": \"{{ item.ingested_at }}\",\n        \"hash\": \"{{ item.hash }}\",\n        \"status\": \"PENDING_SCORE\"\n      }\n    }{{ ',' if not loop.last }}\n    {% endfor %}\n  ]\n}"
+      },
+      "id": "node-airtable-write",
+      "name": "Write Novel Items to Airtable",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.N8N_WEBHOOK_SCORE_ROUTE }}",
+        "body": "{\n  \"novel_items\": \"{{ $json.novel_items }}\",\n  \"novel_count\": \"{{ $json.novel_count }}\",\n  \"ingestion_timestamp\": \"{{ $json.ingestion_timestamp }}\"\n}"
+      },
+      "id": "node-trigger-score",
+      "name": "Trigger Score & Route Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "node-cron": {
+      "main": [
+        [
+          {
+            "node": "node-newsapi",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "node-rss-tier1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-newsapi": {
+      "main": [
+        [
+          {
+            "node": "node-parse-newsapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-rss-tier1": {
+      "main": [
+        [
+          {
+            "node": "node-parse-rss",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-parse-newsapi": {
+      "main": [
+        [
+          {
+            "node": "node-dedupe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-parse-rss": {
+      "main": [
+        [
+          {
+            "node": "node-dedupe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "node-dedupe": {
+      "main": [
+        [
+          {
+            "node": "node-airtable-write",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "node-trigger-score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,91 +1,127 @@
-# Skill: Google Cloud Translate Integration
+# Skill: GCTranslate Integration
 
 ## Purpose
-Integrate Google Cloud Translation API for multi-language support: translate content, detect source language, implement localization workflows, and manage translation quality and consistency.
+Integrate Translation Bureau's GCTranslate service — the Government of Canada's AI-powered, sovereign alternative to public internet translation tools for federal public servants. Enable secure, policy-aligned EN↔FR translation for internal communications while maintaining human-in-the-loop control and compliance.
+
+## What is GCTranslate
+
+**GCTranslate** is a Protected B-capable translation platform developed by Public Services and Procurement Canada (PSPC) and the Translation Bureau, built on the GC's 8-billion-word bilingual corpus and Canadian linguistic conventions. It represents a "lighthouse" enterprise AI implementation: centralized, sovereign, policy-aligned, and reusable across departments.
+
+**Strategic Significance**:
+- First visible GC enterprise AI shared service (alongside HC/PHAC platform patterns)
+- Demonstrates governance-first deployment and human-in-the-loop operation
+- Canadian data residency (internal hosting, not reliant on US services)
+- Reusable infrastructure reducing departmental fragmentation
 
 ## When to use
-- Translating documents, web content, or user-generated text
-- Multi-language product/service support
-- Global audience communications
-- Localization pipelines
-- Language detection and routing
-- Content bridging across language communities
-- Accessibility (language alternatives)
+- Internal emails and Teams messages (both languages)
+- Meeting notes and transcripts (bilingual capture)
+- Operational documentation (policies, procedures, internal guidance)
+- Real-time bilingual communication (Teams message translation)
+- Quick drafting in one language with translation to the other
+- Departmental coordination across language communities
+
+## When NOT to use
+- Cabinet documents (requires Translation Bureau professional review)
+- Legislation and regulatory text
+- Public-facing communications (public websites, media releases, citizen-facing content)
+- Health/safety advisories (life-safety risk)
+- High-risk regulatory material (financial, legal, compliance-critical)
+- Anything requiring official translation certificates
 
 ## Inputs
-- Text or document content (plain text, HTML, XML)
-- Source language (auto-detect or specified)
-- Target language(s) (single or batch)
-- Optional: glossary for terminology consistency
-- Optional: context or domain hints
-- Optional: custom model/mode (base, advanced)
+- Source text (EN or FR)
+- Target language (FR or EN)
+- Optional: context, glossary, department terminology
+- Optional: document context (email, meeting note, operational memo)
 
 ## Outputs
-- Translated text with language metadata
-- Confidence scores or quality indicators
-- Language detection results
-- Formatting preservation (HTML, newlines)
-- Translation alternatives or variants
-- Glossary compliance report
+- Translated text (EN↔FR)
+- Confidence/quality indicators
+- Suggested terminology from GC glossaries
+- Audit trail (source, translator, timestamp, approval status)
+- Human review prompts for sensitive content
 
 ## Constraints
-- Character limits per request (manage batching)
-- Supported language pairs (validate before translation)
-- API quota and rate limits
-- Cost tracking (billed per character)
-- Sensitive data handling (PHI, PII considerations)
-- Quality thresholds for auto-acceptance
-- Regional availability and latency
+- Protected B data environment (secure)
+- Character limits per request (batch large documents)
+- Only EN↔FR language pair
+- Not for public or high-risk content (human judgment required)
+- Intended for internal GC use only
+- Requires GC network access or VPN
+- Department must be onboarded (PSPC manages access)
 
-## Workflow
-1. **Initialize client** - Set up GCP credentials and project
-2. **Detect language** - Identify source language if not specified
-3. **Prepare content** - Parse, normalize, and batch as needed
-4. **Select mode** - Choose standard or advanced translation
-5. **Apply glossary** - Use custom glossaries for terminology
-6. **Translate** - Call API with batched requests
-7. **Validate quality** - Check confidence scores, format preservation
-8. **Post-process** - Apply formatting, review for context
-9. **Cache/store** - Archive translations for reuse and audit
+## Workflow (SaaS Platform Usage)
+1. **Authenticate** - Log in to GCTranslate portal using GC credentials (GCKey, GCID)
+2. **Access platform** - Navigate to web interface (GC-hosted)
+3. **Prepare content** - Copy/paste or upload text (EN or FR source)
+4. **Classify sensitivity** - Select document type (email, memo, meeting note, etc.)
+5. **Submit translation** - Click translate button, receive EN↔FR output
+6. **Review output** - Check quality, GC terminology, cultural appropriateness
+7. **Apply human judgment** - Accept, edit, or flag for Translation Bureau escalation
+8. **Copy and use** - Paste into Teams, email, SharePoint, or target system
+9. **Track usage** - Platform logs translations for audit trail and learning
 
 ## Quality checks
-- No characters lost in translation
-- HTML/formatting preserved
-- Glossary terms enforced
-- Confidence scores above threshold
-- No untranslatable content
-- Consistency across related translations
-- Reviewed by domain expert for critical content
-- Accessibility of translated content verified
+- Translation preserves meaning and tone
+- GC terminology and conventions applied (not generic internet language)
+- No untranslatable or corrupted sections
+- No PII/sensitive data exposure
+- Bilingual consistency across related documents
+- Human review completed for sensitive content
+- Audit trail recorded (who requested, when, which version approved)
 
-## Output formats
-- Plain text (translated)
-- HTML/XML (with formatting preserved)
-- JSON with metadata (translation, confidence, language)
-- CSV batch export
-- Integration event (webhook, message queue)
+## Use Case Examples
+- **Urgent email response**: Public servant receives EN email, uses GCTranslate to draft FR response quickly
+- **Team alignment**: Translate key meeting decisions to FR for minority language team members
+- **Policy memo rollout**: Draft policy in EN, translate via GCTranslate, publish both versions
+- **Bilingual briefing**: Translate news summaries or reports for executive briefing in both languages
+- **Cross-departmental communication**: PSPC guidance translated for other departments using GCTranslate
 
-## Configuration
-- GCP project ID and credentials
-- API endpoint (standard, advanced)
-- Glossary references
-- Cache settings
-- Batch size and concurrency
-- Error handling (fail-fast vs. partial success)
-- Logging and audit trail
+## Outputs from SaaS Platform
+- Translated text (EN↔FR, copy-paste ready)
+- Suggested terminology (from GC glossaries)
+- Quality confidence indicator
+- Usage log (department, user, timestamp, content type)
+- Translation history (searchable for reuse)
 
-## Integrations
-- Content management systems
-- Web frameworks (Django, Express, FastAPI)
-- Document pipelines (PDF, Word)
-- Real-time messaging (chat, notifications)
-- Analytics/feedback systems
-- Quality assurance workflows
+## Department Onboarding (SaaS Access)
+- **Request access**: Submit department onboarding request to PSPC
+- **User provisioning**: GC credentials (GCKey, GCID) grant platform access
+- **Training**: Translation Bureau provides user guides and best practices
+- **Department glossary**: Optional custom terminology for domain-specific language (finance, health, etc.)
+- **Usage monitoring**: Track translations per department/user for governance
+- **Escalation workflow**: Define process for flagging high-risk content to Translation Bureau
+
+## Workflow Integration (Using SaaS Platform)
+- **Teams**: Copy message → GCTranslate → paste translated version in thread or separate message
+- **Email**: Draft in EN → copy to GCTranslate → paste FR version to Outlook reply
+- **SharePoint**: Store original and translated versions side-by-side with metadata
+- **Meeting notes**: Transcribe in one language → translate via GCTranslate → publish bilingual notes
+- **Memo/directive**: Author in EN → translate → distribute both versions
+- **Manual escalation**: Flag high-risk content → send to Translation Bureau for professional review
+
+## Related Patterns
+This skill demonstrates the **governance-first enterprise AI** pattern used in the HC/PHAC platform strategy:
+- Centralized shared service (not departmental silos)
+- Sovereign Canadian infrastructure
+- Human-in-the-loop (augmentation, not replacement)
+- Department onboarding at varying maturity levels
+- Reusable infrastructure and terminology standards
+- Audit trail for compliance and transparency
+
+## References
+- [Translation Bureau AI Guidance](https://www.canada.ca/en/services/gctranslate)
+- [GCtranslate Overview](https://www.canada.ca/en/services/government-canada-translate)
+- PSPC AI Strategy 2025–2027 (GCTranslate as reference implementation)
+- Early adopter departments: PSPC, PCO, Finance Canada, Canadian Heritage, FINTRAC, RCMP
 
 ## Examples
-- Multi-language customer support portal
-- Global marketing campaign (blog → 10 languages)
-- Software UI localization
-- Real-time chat translation
-- Document archive with translation index
-- Accessibility: auto-generate alt text in multiple languages
+See: `examples/` directory for:
+- Bilingual Teams workflow
+- Email draft translation pattern
+- Meeting note capture and translation
+- Departmental onboarding checklist
+
+## Status
+✅ **Reference implementation ready** — Use for HC/PHAC enterprise AI platform design
