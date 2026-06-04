@@ -94,6 +94,10 @@ skills/
 - **Strategic Screening** - Opportunity screening and governance evaluation framework
 - **Accessible PPTX** - Accessibility validation and remediation for PowerPoint presentations
 
+## Docker images
+
+- **Claude Code**: `docker/claude-code/` contains a small Alpine-based Docker image and Compose entrypoint for running Claude Code in a container against a mounted repository.
+
 ## Skill format
 
 Each skill should define:
