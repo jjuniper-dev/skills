@@ -96,7 +96,7 @@ skills/
 
 ## Docker images
 
-- **Claude Code**: `docker/claude-code/` contains a small Alpine-based Docker image for running Claude Code in a container against a mounted repository.
+- **Claude Code**: `docker/claude-code/` contains a small Alpine-based Docker image and Compose entrypoint for running Claude Code in a container against a mounted repository.
 
 ## Skill format
 

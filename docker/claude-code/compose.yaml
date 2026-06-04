@@ -1,0 +1,21 @@
+services:
+  claude-code:
+    build:
+      context: .
+      args:
+        ALPINE_VERSION: "3.22"
+        CLAUDE_CODE_VERSION: stable
+    image: claude-code:alpine
+    stdin_open: true
+    tty: true
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      DISABLE_AUTOUPDATER: "1"
+      USE_BUILTIN_RIPGREP: "0"
+    volumes:
+      - ${WORKSPACE:-../..}:/workspace
+      - claude-code-home:/home/claude/.claude
+    working_dir: /workspace
+
+volumes:
+  claude-code-home:
