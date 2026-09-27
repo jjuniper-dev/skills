@@ -94,3 +94,7 @@ Generate clean, executive-ready architecture diagrams from structured or natural
 - Support both C4 model and UML-style diagrams
 - Can generate from architecture decision records (ADRs)
 - Integrates with diagram-as-code tools
+
+
+## Skill Contract v2
+This skill is registered under Skill Contract v2. Its machine-readable authority, provenance, evidence, stop-condition, and handoff contract is in `skill.yaml`. Diagram production does not itself approve architecture or publication.

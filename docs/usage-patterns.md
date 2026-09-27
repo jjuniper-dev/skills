@@ -373,3 +373,16 @@ Common workflows for using skills in various contexts.
 6. **Keep it simple**: Fewer elements done well beats overcomplicated
 7. **Update regularly**: Keep examples and templates current
 8. **Document decisions**: Note why choices were made for future reference
+
+
+## Governed Skill Contract v2 workflow
+
+1. Resolve the skill ID in `registry.yaml`.
+2. Verify the source SHA-256 and immutable revision.
+3. Bind the skill to an eligible runtime without changing its authority ceiling.
+4. Let the external orchestrator enforce work authority, tools, credentials, leases, and human gates.
+5. Execute the skill procedure and collect its declared evidence.
+6. Apply the declared stop conditions fail-closed.
+7. Return the defined handoff to the next governed stage.
+
+Use `tools/resolve_skill.py --format wf60` for the provider-neutral binding shape used by PCA/WF60 integration.

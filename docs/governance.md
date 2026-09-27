@@ -216,3 +216,12 @@ A: Deprecate if replacing with a better alternative. Update if improving the exi
 
 **Q: Can I modify an example after it's merged?**
 A: Yes, improvements are always welcome. File a PR with the `skill-improvement` label.
+
+
+## Skills Repository v2 governance
+
+The canonical discovery surface is `registry.yaml`. V2 skills must include a machine-readable `skill.yaml` that validates against `schemas/skill-contract-v2.schema.json`.
+
+A skill defines reusable procedure and evidence expectations but never grants work, tool, credential, lease, merge, publication, or production authority. Governed consumers must enforce those controls externally.
+
+Governed use must retain the skill path, immutable release or commit revision, and SHA-256 content hash. Legacy skills remain registered but are not treated as v2 contracts until migrated deliberately.

@@ -1,142 +1,83 @@
 # Skills
 
-Reusable skill definitions, artifact-production rules, prompt templates, schemas, and validation patterns for architecture, briefing, PowerPoint, and governance-oriented AI workflows.
+Canonical portable skill library for reusable, governed AI and enterprise-architecture capabilities.
 
-## Purpose
+## Authority boundary
 
-This repository is a versioned capability library. It is intended to make repeated work easier, more consistent, and more auditable by turning high-value prompts and production standards into reusable skills.
+This repository defines **capability procedure**, not execution authority. A skill cannot create work authority, tool authority, credential authority, leases, merge approval, publication approval, or production authority. Governed consumers such as PCA/WF60 must supply those controls externally.
 
-The repo is designed for:
+## Skill Contract v2
 
-- Enterprise architecture artifact production
-- Executive presentation and decision support
-- Multi-language content and localization
-- Briefing notes and government-style written artifacts
-- Strategic screening and governance review
-- Knowledge graph construction and relationship mapping
-- Real-time intelligence and news aggregation
-- Accessible presentation production
-- Agent-supported workflows and future automation
+V2 skills pair human guidance (`SKILL.md`) with a machine-readable contract (`skill.yaml`) using:
 
+**Intent → Preconditions → Inputs → Authority → Procedure → Allowed Mutations → Evidence → Success Criteria → Stop Conditions → Handoff**
+
+See `docs/skill-contract-v2.md`.
+
+## Registry and provenance
+
+`registry.yaml` is the canonical discovery surface. Every registered skill includes repository path, release revision, SHA-256 source hash, declared runtimes, authority class, mutation level, capability mappings, and evidence requirements.
+
+Resolve a governed binding with:
+
+```bash
+python tools/resolve_skill.py --skill governed-execution --runtime codex --format wf60
+```
+## Production v2 skills
+
+- `architecture-diagram`
+- `work-package-orchestration`
+- `governed-execution`
+- `agent-dispatch`
+- `outcome-verification`
+- `runtime-evidence`
+- `credential-authority`
+- `evidence-engineering`
+- `session-handover`
+- `ea-delivery-pipeline`
+- `qa-recording-evidence`
+
+Existing v1 skills remain registered as `legacy` until deliberately migrated. `powerpoint-arb-deck` is retained as deprecated history.
+
+## Validation
+
+```bash
+python -m pip install -r requirements-dev.txt
+python tools/build_registry.py
+python tools/validate_repo.py --strict
+python -m unittest discover -s tests -v
+python tools/portability_proof.py --check
+```
+
+GitHub Actions runs the validation and test spine on pull requests and `main`.
 ## Repository structure
 
 ```text
-skills/
-├── README.md
-├── skills/
-│   ├── architecture-diagram/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   └── templates/
-│   ├── briefing-note/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   └── templates/
-│   ├── presentation-deck/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   ├── templates/
-│   │   └── validators/
-│   ├── strategic-screening/
-│   │   ├── SKILL.md
-│   │   └── rubrics/
-│   ├── powerpoint-arb-deck/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   └── templates/
-│   ├── neo4j-graph-builder/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   ├── schemas/
-│   │   └── queries/
-│   ├── social-feed-news-integration/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   └── integration-patterns/
-│   ├── gctranslate-integration/
-│   │   ├── SKILL.md
-│   │   ├── examples/
-│   │   ├── glossaries/
-│   │   └── integration-patterns/
-│   └── accessible-pptx/
-│       ├── SKILL.md
-│       └── validators/
-├── schemas/
-│   ├── skill.schema.json
-│   ├── artifact-request.schema.json
-│   └── architecture.schema.json
-├── prompts/
-│   ├── system/
-│   └── task/
-└── docs/
-    ├── governance.md
-    ├── naming-conventions.md
-    ├── usage-patterns.md
-    └── hc-template-guide.md
+.github/workflows/validate.yml
+registry.yaml
+schemas/
+  skill-contract-v2.schema.json
+  skill-registry.schema.json
+skills/<skill>/
+  SKILL.md
+  skill.yaml          # v2 skills only
+tools/
+  build_registry.py
+  validate_repo.py
+  resolve_skill.py
+  portability_proof.py
+docs/
+  skill-contract-v2.md
+  wf60-integration.md
+  baseline-v2.json
+evidence/
+  portability-proof.json
 ```
 
-## Core Skills
+## Governance
 
-### Presentation & Storytelling
-- **Presentation Deck** - Generic PPTX production for executive, governance, and business communications (ARB, strategy, briefings)
-- **Briefing Note** - Structured government-style briefings for policy, program, or architecture decisions
-- **PowerPoint ARB Deck** - [Legacy] Specialized ARB submission decks
-
-### Architecture & Design
-- **Architecture Diagram** - Clean, executive-ready architecture diagrams from text or structured input
-- **Neo4j Graph Builder** - Graph database schema generation, Cypher queries, knowledge graph modeling
-
-### Intelligence & Integration
-- **Social Feed & News Integration** - Real-time aggregation and normalization of social feeds and news sources
-- **Google Cloud Translate** - Multi-language content translation with glossary support and localization workflows
-
-### Governance & Analysis
-- **Strategic Screening** - Opportunity screening and governance evaluation framework
-- **Accessible PPTX** - Accessibility validation and remediation for PowerPoint presentations
-
-## Docker images
-
-- **Claude Code**: `docker/claude-code/` contains a small Alpine-based Docker image and Compose entrypoint for running Claude Code in a container against a mounted repository.
-
-## Skill format
-
-Each skill should define:
-
-- Purpose
-- When to use it
-- Inputs
-- Outputs
-- Constraints
-- Workflow
-- Quality checks
-- Examples
-
-## Design principles
-
-- Prefer reusable patterns over one-off prompts
-- Keep artifacts traceable, versioned, and reviewable
-- Separate production rules from project-specific content
-- Make governance and accessibility checks explicit
-- Support both human use and future agent use
-- Integrate with enterprise systems and workflows
-- Document integration points and API contracts
-
-## Recent enhancements
-
-- **Presentation Deck**: Generalized from ARB-only to support any organizational context
-- **Architecture Diagram**: Added diagram type guidance and enhanced quality criteria
-- **Neo4j Graph Builder**: New skill for graph database modeling
-- **Social Feed Integration**: New skill for real-time intelligence aggregation
-- **GCTranslate Integration**: New skill for multi-language support
-
-## Usage patterns
-
-[See docs/usage-patterns.md for workflow examples]
-
-## Governance & Naming
-
-[See docs/governance.md and docs/naming-conventions.md for standards]
-
-## HC Template Guide
-
-[See docs/hc-template-guide.md for template specification and integration]
+- Prefer reusable mechanisms over project-specific instructions.
+- Keep transient tickets, run IDs, leases, branches, secret paths, and current runtime state out of skill definitions.
+- Pin governed skill use to an immutable revision or release plus source hash.
+- Preserve independent verification and retained human gates.
+- Skill possession never grants tool or mutation authority.
