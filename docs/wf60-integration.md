@@ -14,7 +14,7 @@ A governed consumer resolves a skill to a binding containing:
   "source": {
     "repository": "https://github.com/jjuniper-dev/skills",
     "path": "skills/governed-execution/SKILL.md",
-    "revision": "v2.0.0",
+    "revision": "v2.0.1",
     "sha256": "<verified sha256>"
   },
   "authority": {

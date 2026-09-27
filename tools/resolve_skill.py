@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import sys
 
 import yaml
 
+from text_hash import canonical_text_sha256
+
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "https://github.com/jjuniper-dev/skills"
 
 def sha256_file(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return canonical_text_sha256(path)
 
 def load_registry():
     return yaml.safe_load((ROOT / "registry.yaml").read_text(encoding="utf-8"))

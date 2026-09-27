@@ -1,4 +1,5 @@
 import sys
+import tempfile
 from pathlib import Path
 import unittest
 
@@ -6,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from resolve_skill import resolve
+from text_hash import canonical_text_sha256
 from validate_repo import validate
 
 class SkillContractTests(unittest.TestCase):
@@ -26,6 +28,15 @@ class SkillContractTests(unittest.TestCase):
         self.assertFalse(binding["authority"]["grants_authority"])
         self.assertTrue(binding["source"]["path"].startswith("skills/"))
         self.assertEqual(len(binding["source"]["sha256"]), 64)
+
+    def test_text_hash_is_portable_across_line_endings(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            lf = root / "lf.md"
+            crlf = root / "crlf.md"
+            lf.write_bytes(b"# Skill\nline two\n")
+            crlf.write_bytes(b"# Skill\r\nline two\r\n")
+            self.assertEqual(canonical_text_sha256(lf), canonical_text_sha256(crlf))
 
 if __name__ == "__main__":
     unittest.main()

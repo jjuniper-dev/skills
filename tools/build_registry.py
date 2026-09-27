@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-import hashlib
 import re
 from pathlib import Path
 import yaml
 
+from text_hash import canonical_text_sha256
+
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "skills"
-RELEASE = "v2.0.0"
+RELEASE = "v2.0.1"
 
 def sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return canonical_text_sha256(path)
 
 def skill_name(text, slug):
     match = re.search(r"^# Skill:\s*(.+)$", text, re.MULTILINE)

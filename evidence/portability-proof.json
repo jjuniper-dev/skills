@@ -20,7 +20,7 @@
     "source": {
       "repository": "https://github.com/jjuniper-dev/skills",
       "path": "skills/governed-execution/SKILL.md",
-      "revision": "v2.0.0",
+      "revision": "v2.0.1",
       "sha256": "29893ae60b4bb1af30ddbc166dcbdf5fb308e021ac20a7066e16a765bc5c7bc8"
     },
     "contract_hash": "e5ca0983ef9259edcd5543a8c8bd5e58294212f3229733aa37ce9458e3813d33",
@@ -48,7 +48,7 @@
     "source": {
       "repository": "https://github.com/jjuniper-dev/skills",
       "path": "skills/governed-execution/SKILL.md",
-      "revision": "v2.0.0",
+      "revision": "v2.0.1",
       "sha256": "29893ae60b4bb1af30ddbc166dcbdf5fb308e021ac20a7066e16a765bc5c7bc8"
     },
     "contract_hash": "e5ca0983ef9259edcd5543a8c8bd5e58294212f3229733aa37ce9458e3813d33",
