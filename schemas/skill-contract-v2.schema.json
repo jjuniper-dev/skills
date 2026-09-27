@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jjuniper-dev/skills/schemas/skill-contract-v2.schema.json",
+  "title": "Portable Skill Contract v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "id", "name", "version", "status", "intent",
+    "preconditions", "inputs", "authority", "procedure", "allowed_mutations",
+    "evidence", "success_criteria", "stop_conditions", "handoff",
+    "runtimes", "tools", "capabilities", "dependencies", "source"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "name": {"type": "string", "minLength": 3},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "status": {"enum": ["production", "experimental", "deprecated"]},
+    "intent": {"type": "string", "minLength": 10},
+    "preconditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "required", "description"],
+        "properties": {
+          "name": {"type": "string"},
+          "required": {"type": "boolean"},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "grants_authority", "constraints"],
+      "properties": {
+        "class": {"enum": ["none", "read", "bounded-mutation", "human-gated-mutation"]},
+        "grants_authority": {"const": false},
+        "constraints": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      }
+    },
+    "procedure": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "allowed_mutations": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "evidence": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "success_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "stop_conditions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "handoff": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "runtimes": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "tools": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_path", "contract_path"],
+      "properties": {
+        "skill_path": {"type": "string", "pattern": "^skills/.+/SKILL\\.md$"},
+        "contract_path": {"type": "string", "pattern": "^skills/.+/skill\\.yaml$"}
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "work_item": "PCA-209",
+  "baseline_date": "2026-09-26",
+  "baseline_commit": "cbba56073a212b359601861be1ef30da158c7636",
+  "json_files": 8,
+  "invalid_json_files": [
+    "skills/n8n-intelligence-automation/workflows/03-archive-obsidian.json",
+    "skills/n8n-intelligence-automation/workflows/04-alerts-teams-email.json",
+    "skills/n8n-intelligence-automation/workflows/05-daily-briefing-digest.json",
+    "skills/n8n-intelligence-automation/workflows/06-feed-health-metrics.json"
+  ],
+  "python_compile": "pass",
+  "ci_present": false,
+  "registry_present": false,
+  "skill_contract_v2_present": false,
+  "source": "Observed directly from GitHub main reconciled to the local read/reference clone before PCA-209 changes."
+}
