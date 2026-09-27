@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import argparse
-import hashlib
 import json
 from pathlib import Path
 
 import jsonschema
 import yaml
+
+from text_hash import canonical_text_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,7 +14,7 @@ def repo_files(pattern):
     return [p for p in ROOT.rglob(pattern) if ".git" not in p.parts and "__pycache__" not in p.parts]
 
 def sha256_file(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return canonical_text_sha256(path)
 
 def load_yaml(path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))

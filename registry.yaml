@@ -1,6 +1,6 @@
 schema_version: '2.0'
 repository: https://github.com/jjuniper-dev/skills
-release_revision: v2.0.0
+release_revision: v2.0.1
 skills:
 - id: accessible-pptx
   name: Accessible PowerPoint (PPTX)
@@ -8,7 +8,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/accessible-pptx/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 838cc7127448e5c62486cf7be723baf560d6a2d275fdc314daefb59fac42622d
   runtimes:
   - chatgpt
@@ -27,7 +27,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/agent-dispatch/SKILL.md
   contract_path: skills/agent-dispatch/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 74028141fcfc8e71535d2124a3154d7275c6ca2bf053981e38126ab040c3ebff
   runtimes:
   - chatgpt
@@ -50,7 +50,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/architecture-diagram/SKILL.md
   contract_path: skills/architecture-diagram/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 0b1700be8eebdbb219cb12069be8bf1dcdb78c35770e742c563a0ebb1571ac7e
   runtimes:
   - chatgpt
@@ -71,7 +71,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/briefing-note/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: c126d0abf31640ee3cba5ebf77105dc766025bc01f2bc0fbc8af5079dd12c6bf
   runtimes:
   - chatgpt
@@ -90,7 +90,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/credential-authority/SKILL.md
   contract_path: skills/credential-authority/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: bb372414a5ae748e923f2cc3653c3a6821b3b3491746abd83e8fc85d9da00309
   runtimes:
   - chatgpt
@@ -114,7 +114,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/ea-delivery-pipeline/SKILL.md
   contract_path: skills/ea-delivery-pipeline/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 7af8d24b14fdf9c7c0a324c509aa63b5102ef5969570ff947299d2e8790d0d74
   runtimes:
   - chatgpt
@@ -138,7 +138,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/evidence-engineering/SKILL.md
   contract_path: skills/evidence-engineering/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: e252538c20f65b97f88bcabc5565640a73fcf91421320ad6ba0ca4ae11ecaa57
   runtimes:
   - chatgpt
@@ -160,7 +160,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/gctranslate-integration/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 5460e54b08609a89afd13c5ab64c84a37ee04bd8aa90d2c30a0ee25ceb5361c8
   runtimes:
   - chatgpt
@@ -179,7 +179,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/governed-execution/SKILL.md
   contract_path: skills/governed-execution/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 29893ae60b4bb1af30ddbc166dcbdf5fb308e021ac20a7066e16a765bc5c7bc8
   runtimes:
   - chatgpt
@@ -202,7 +202,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/hc-phac-intelligence-stack/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: f2a8df4c031ba1c86a91e02c109acf14257f4f58615d6631fa1b6337a5d8fb58
   runtimes:
   - chatgpt
@@ -220,7 +220,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/intelligence-monitoring-platform/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 4ff92e2b936130dcba27151d8c57377505e4d5ded4c14a88435aac39afe41eee
   runtimes:
   - chatgpt
@@ -238,7 +238,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/n8n-intelligence-automation/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 5e4e6945aa9980e21f17e641d179129d72575110a8fce6a983831b5fefc91919
   runtimes:
   - chatgpt
@@ -256,7 +256,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/neo4j-graph-builder/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 2b43b718bfef246262fb3c7827d5e9d5b28bda284fdb782e05e03b98d294c6a1
   runtimes:
   - chatgpt
@@ -274,7 +274,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/news-gathering-integration/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: a71b34bba046b2b4d568389b1a59f1db190f898b17a685eca3e41e2c59b83667
   runtimes:
   - chatgpt
@@ -293,7 +293,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/outcome-verification/SKILL.md
   contract_path: skills/outcome-verification/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: ee61af5616c64fec6893da4d46b032f494f09a1fbcbf160b8f5600655ba69509
   runtimes:
   - chatgpt
@@ -316,7 +316,7 @@ skills:
   status: deprecated
   contract_version: '1.0'
   source_path: skills/powerpoint-arb-deck/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 6ce8010e41b6723a1f843180c6b4e0893e01500e3b9277f7fbdd152e0ce66df2
   runtimes:
   - chatgpt
@@ -334,7 +334,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/presentation-deck/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 3c3f6cfac88579ff1f9050fe0b7bff6fa2fc483d5f1300eeda9e17e4e758fb1e
   runtimes:
   - chatgpt
@@ -352,7 +352,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/prompts/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 9782f3222ea581dfcac129bc9d6832a5de01c185217e7c7d353f769dc29f6947
   runtimes:
   - chatgpt
@@ -371,7 +371,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/qa-recording-evidence/SKILL.md
   contract_path: skills/qa-recording-evidence/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: ccbe91a2500247a620693206db90e9ff9546699e6fc7e037d3cf2475ed7b6e27
   runtimes:
   - chatgpt
@@ -394,7 +394,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/runtime-evidence/SKILL.md
   contract_path: skills/runtime-evidence/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 29e8cb45580a57229c3f892ae4e7befb45fa2bd8fe65e53448af3e229671afde
   runtimes:
   - chatgpt
@@ -419,7 +419,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/session-handover/SKILL.md
   contract_path: skills/session-handover/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: bfba050c3adad7ff4efffd55fc8fd75968ac9961eea1893b375ddb815ab79686
   runtimes:
   - chatgpt
@@ -441,7 +441,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/social-feed-news-integration/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 1dc56b75689c8e8457a30d5605e687769f106f6db297b4b778fb3de3b55b3d4a
   runtimes:
   - chatgpt
@@ -459,7 +459,7 @@ skills:
   status: legacy
   contract_version: '1.0'
   source_path: skills/strategic-screening/SKILL.md
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 8a17a233383e96dc86cbd063b6330dc80524a7900a1c060a0a688d8b1310e9a8
   runtimes:
   - chatgpt
@@ -478,7 +478,7 @@ skills:
   contract_version: '2.0'
   source_path: skills/work-package-orchestration/SKILL.md
   contract_path: skills/work-package-orchestration/skill.yaml
-  source_revision: v2.0.0
+  source_revision: v2.0.1
   source_sha256: 85310d141d6241bec0830c60d14eb608f5d830966c659c04d57bec8ea2eaf22e
   runtimes:
   - chatgpt
